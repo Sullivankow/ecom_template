@@ -1,0 +1,8 @@
+# Ignorer le fichier de configuration sensible
+config/settings.py
+# Environnement virtuel
+venv/
+# Fichiers de migration
+*/migrations/*
+# Fichier .env (si jamais tu le réutilises)
+.env
