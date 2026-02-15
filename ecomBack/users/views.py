@@ -79,6 +79,29 @@ class UserSelfUpdateView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    @swagger_auto_schema(
+        security=[{'Bearer': []}],
+        request_body=UserUpdateSerializer,
+        operation_summary="Remplacement complet du profil utilisateur",
+        operation_description="Permet à l'utilisateur authentifié de remplacer toutes ses informations (PUT).",
+        tags=["Utilisateur"]
+    )
+    def put(self, request):
+        serializer = UserUpdateSerializer(request.user, data=request.data)  # partial=False par défaut
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    @swagger_auto_schema(
+    security=[{'Bearer': []}],
+    operation_summary="Suppression du compte utilisateur",
+    operation_description="Permet à l'utilisateur authentifié de supprimer définitivement son compte (DELETE).",
+    tags=["Utilisateur"]
+)
+    def delete(self, request):
+     user = request.user
+     user.delete()
+     return Response({"detail": "Compte supprimé avec succès."}, status=status.HTTP_204_NO_CONTENT)
     
  
      

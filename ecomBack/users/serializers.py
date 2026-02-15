@@ -148,5 +148,4 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         }
         
         
-        # ----- Modification PUT -----
-# (À ajouter) UserUpdateSerializer : Serializer pour la modification des informations utilisateur (PUT /users/me/)
+  
