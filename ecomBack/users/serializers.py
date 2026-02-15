@@ -4,6 +4,7 @@ Inclut le serializer d’inscription et les méthodes de validation et création
 """
 # On importe le module serializers de Django REST Framework
 from rest_framework import serializers
+import re
 from django.contrib.auth import get_user_model
 
 
@@ -30,6 +31,51 @@ class RegisterSerializer(serializers.ModelSerializer):
         if attrs['password'] != attrs['password2']:
             raise serializers.ValidationError({"password": "Les mots de passe ne correspondent pas."})
         return attrs
+    
+    def validate_password(self, value):
+        """
+        Valide la complexité du mot de passe utilisateur.
+        Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule et un caractère spécial.
+
+        Args:
+            value (str): Le mot de passe à valider.
+
+        Raises:
+            serializers.ValidationError: Si le mot de passe ne respecte pas les critères de sécurité.
+
+        Returns:
+            str: Le mot de passe validé.
+        """
+        if not re.match(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\\W).{8,}$', value):
+            raise serializers.ValidationError(
+                "Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule et un caractère spécial."
+            )
+        return value
+    
+    def validate_email(self, value):
+        """
+        Valide le format de l'adresse e-mail et applique des règles de sécurité supplémentaires.
+        L'adresse doit être valide, ne pas contenir d'espaces, ni de caractères suspects.
+
+        Args:
+            value (str): L'adresse e-mail à valider.
+
+        Raises:
+            serializers.ValidationError: Si l'adresse e-mail ne respecte pas les critères de sécurité.
+
+        Returns:
+            str: L'adresse e-mail validée.
+        """
+        import re
+        # Regex stricte pour email : pas d'espaces, caractères spéciaux limités, format classique
+        if not re.match(r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$', value):
+            raise serializers.ValidationError("Adresse e-mail invalide ou suspecte.")
+        if ' ' in value:
+            raise serializers.ValidationError("L'adresse e-mail ne doit pas contenir d'espaces.")
+        # Optionnel : blacklist de domaines ou caractères
+        # if value.endswith('@tempmail.com'):
+        #     raise serializers.ValidationError("Les adresses temporaires ne sont pas autorisées.")
+        return value
 
     def create(self, validated_data):
         """
