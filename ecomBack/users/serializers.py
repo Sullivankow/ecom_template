@@ -8,6 +8,11 @@ import re
 from django.contrib.auth import get_user_model
 
 
+# ----- INSCRIPTION -----
+# RegisterView : Vue d'inscription (POST /users/register/)
+
+
+
 class RegisterSerializer(serializers.ModelSerializer):
     """
     Serializer pour l'inscription d'un nouvel utilisateur.
@@ -124,3 +129,10 @@ def create(self, validated_data):
     user = get_user_model().objects.create_user(**validated_data)
     # On retourne l'utilisateur créé
     return user
+
+
+
+
+# ----- CONNEXION -----
+# (À ajouter) LoginView : Vue de connexion (POST /api/token/ ou /login/)
+

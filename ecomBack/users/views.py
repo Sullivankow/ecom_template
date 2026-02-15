@@ -1,3 +1,13 @@
+# =========================
+# SERVICES UTILISATEUR
+# =========================
+
+# ----- INSCRIPTION -----
+# RegisterView : Vue d'inscription (POST /users/register/)
+
+
+
+
 # Importation des classes génériques de DRF pour créer des vues basées sur les classes.
 from rest_framework import generics
 # Importation du serializer d'inscription utilisateur.
@@ -20,9 +30,38 @@ class RegisterView(generics.CreateAPIView):
 	queryset = get_user_model().objects.all()
 	serializer_class = RegisterSerializer
 
-	@swagger_auto_schema(operation_summary="Inscription d'un nouvel utilisateur")
+	@swagger_auto_schema(operation_summary="Inscription d'un nouvel utilisateur",tags=["Utilisateur"])
 	def post(self, request, *args, **kwargs):
+     
 		"""
 		Crée un nouvel utilisateur à partir des données envoyées en POST.
 		"""
 		return super().post(request, *args, **kwargs)
+
+
+# ----- CONNEXION -----
+# (À ajouter) LoginView : Vue de connexion (POST /api/token/ ou /login/)
+
+
+
+from rest_framework_simplejwt.views import TokenObtainPairView
+from drf_yasg.utils import swagger_auto_schema
+
+class LoginView(TokenObtainPairView):
+    @swagger_auto_schema(
+        operation_summary="Connexion utilisateur (JWT)",
+        operation_description="Obtenir un token d'accès et de rafraîchissement via login/mot de passe.",
+        tags=["Utilisateur"]
+    )
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
+
+
+
+
+
+
+
+
+# ----- AUTRES SERVICES -----
+# (Exemple : récupération de profil, modification, etc.)
