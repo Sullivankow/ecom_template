@@ -6,16 +6,15 @@
 # RegisterView : Vue d'inscription (POST /users/register/)
 
 
-
-
-# Importation des classes génériques de DRF pour créer des vues basées sur les classes.
-from rest_framework import generics
-# Importation du serializer d'inscription utilisateur.
-from .serializers import RegisterSerializer
-# Importation de la fonction pour récupérer le modèle utilisateur personnalisé.
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status, generics
+from .serializers import UserUpdateSerializer, RegisterSerializer
 from django.contrib.auth import get_user_model
-# Importation du décorateur pour personnaliser la doc Swagger
 from drf_yasg.utils import swagger_auto_schema
+from rest_framework_simplejwt.views import TokenObtainPairView
+
 
 
 class RegisterView(generics.CreateAPIView):
@@ -63,5 +62,24 @@ class LoginView(TokenObtainPairView):
 
 
 
-# ----- AUTRES SERVICES -----
-# (Exemple : récupération de profil, modification, etc.)
+# ----- Modification PATCH -----
+# (À ajouter) UserUpdateSerializer : Serializer pour la modification des informations utilisateur (PATCH /users/me/)
+class UserSelfUpdateView(APIView):
+    permission_classes = [IsAuthenticated]
+    @swagger_auto_schema(
+        security=[{'Bearer': []}],
+        request_body=UserUpdateSerializer,
+        operation_summary="Modification du profil utilisateur",
+        operation_description="Permet à l'utilisateur authentifié de modifier ses informations (PATCH).",
+        tags=["Utilisateur"]
+    )
+    def patch(self, request):
+        serializer = UserUpdateSerializer(request.user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+ 
+     
+

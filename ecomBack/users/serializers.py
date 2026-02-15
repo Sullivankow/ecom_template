@@ -133,6 +133,20 @@ def create(self, validated_data):
 
 
 
-# ----- CONNEXION -----
-# (À ajouter) LoginView : Vue de connexion (POST /api/token/ ou /login/)
+# ----- Modification PATCH -----
+# (À ajouter) UserUpdateSerializer : Serializer pour la modification des informations utilisateur (PATCH /users/me/)
 
+class UserUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = get_user_model()
+        fields = ('username', 'email', 'first_name', 'last_name')
+        extra_kwargs = {
+            'username': {'required': False},
+            'email': {'required': False},
+            'first_name': {'required': False},
+            'last_name': {'required': False},
+        }
+        
+        
+        # ----- Modification PUT -----
+# (À ajouter) UserUpdateSerializer : Serializer pour la modification des informations utilisateur (PUT /users/me/)
