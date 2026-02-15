@@ -5,6 +5,6 @@ from .views import UserSelfUpdateView
 
 urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'),
-     path('login/', LoginView.as_view(), name='login'),
-     path('me/update/', UserSelfUpdateView.as_view(), name='user-self-update'),
+    path('login/', LoginView.as_view(), name='login'),
+    path('account/me/', UserSelfUpdateView.as_view(), name='account-me'),
 ]
