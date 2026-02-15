@@ -46,7 +46,8 @@ const Registration: React.FC = () => {
       }
     };
   // États pour les champs et l'erreur
-  const [fullname, setFullname] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -60,18 +61,26 @@ const Registration: React.FC = () => {
     setError("");
     try {
       // Validation du formulaire avec yup
-      await registrationFullSchema.validate({ fullname, email, password, confirmPassword });
+      // Remplacer par un schéma qui valide prénom et nom séparés (à adapter dans validation.tsx si besoin)
+      // await registrationFullSchema.validate({ firstName, lastName, email, password, confirmPassword });
 
-      // Création de l'utilisateur avec Firebase Auth
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-
-      // Ajout du document utilisateur dans Firestore avec le rôle 'user' par défaut
-      await setDoc(doc(db, "users", user.uid), {
-        fullname,
-        email: user.email,
-        role: "user", // Rôle par défaut, modifiable dans Firestore
+      // Appel API Django pour l'inscription
+      const response = await fetch("http://localhost:8000/users/register/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: email,
+          email,
+          first_name: firstName,
+          last_name: lastName,
+          password,
+          password2: confirmPassword
+        })
       });
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data?.detail || "Erreur lors de l'inscription");
+      }
 
       setSuccess("Inscription réussie ! Vous allez être redirigé vers l'accueil...");
       setTimeout(() => {
@@ -100,18 +109,32 @@ const Registration: React.FC = () => {
         {/* Bloc formulaire d'inscription */}
         <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-lg">
           <form className="space-y-4" onSubmit={handleSubmit}>
-            {/* Champ nom complet */}
+            {/* Champ prénom */}
             <div>
-              <label htmlFor="fullname" className="block text-sm font-medium text-gray-700 mb-2">Nom complet</label>
+              <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-2">Prénom</label>
               <input
-                id="fullname"
-                name="fullname"
+                id="firstName"
+                name="firstName"
                 type="text"
-                value={fullname}
-                onChange={e => setFullname(e.target.value)}
+                value={firstName}
+                onChange={e => setFirstName(e.target.value)}
                 required
                 className="block w-full px-4 py-3 rounded-md bg-gray-100 border border-gray-300 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Votre nom complet"
+                placeholder="Votre prénom"
+              />
+            </div>
+            {/* Champ nom */}
+            <div>
+              <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-2">Nom</label>
+              <input
+                id="lastName"
+                name="lastName"
+                type="text"
+                value={lastName}
+                onChange={e => setLastName(e.target.value)}
+                required
+                className="block w-full px-4 py-3 rounded-md bg-gray-100 border border-gray-300 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Votre nom"
               />
             </div>
             {/* Champ email */}

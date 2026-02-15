@@ -16,9 +16,12 @@ class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})
     password2 = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})
 
+    first_name = serializers.CharField(required=True)
+    last_name = serializers.CharField(required=True)
+
     class Meta:
         model = get_user_model()
-        fields = ('username', 'email', 'password', 'password2')
+        fields = ('username', 'email', 'first_name', 'last_name', 'password', 'password2')
 
     def validate(self, attrs):
         """
@@ -33,7 +36,10 @@ class RegisterSerializer(serializers.ModelSerializer):
         Crée un nouvel utilisateur après validation des données.
         """
         validated_data.pop('password2')
-        user = get_user_model().objects.create_user(**validated_data)
+        password = validated_data.pop('password')
+        user = get_user_model().objects.create(**validated_data)
+        user.set_password(password)
+        user.save()
         return user
 
 # Méthode de validation globale pour vérifier que les deux mots de passe correspondent
